@@ -18,8 +18,8 @@ func init() {
 		Usage: "performs the reconciliation process by comparing transactions within the specified timeframe across system and bank statement data.",
 		Action: func(ctx *cli.Context) error {
 			fmt.Println("Transactions processed\t:", 0)
-			fmt.Println("Matched processed\t:", 0)
-			fmt.Println("Unmatched processed\t:", 0)
+			fmt.Println("Matched transactions\t:", 0)
+			fmt.Println("Unmatched transactions\t:", 0)
 			fmt.Println()
 			fmt.Println("Missing bank statement:")
 			for i, v := range []string{} {
