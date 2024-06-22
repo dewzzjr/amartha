@@ -2,15 +2,16 @@ package reconcile
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 )
 
 var app *cli.App
 var param struct {
 	SourceFile     string
-	StatementFiles cli.StringSlice
+	StatementFiles []string
 	Start          cli.Timestamp
 	End            cli.Timestamp
 }
@@ -32,11 +33,13 @@ func init() {
 			},
 			&cli.MultiStringFlag{
 				Target: &cli.StringSliceFlag{
-					Name:        "statement",
-					Usage:       "Bank statement CSV file path (can handle multiple files from different banks)",
-					Aliases:     []string{"bank", "b"},
-					Destination: &param.StatementFiles,
+					Name:      "statement",
+					Usage:     "Bank statement CSV file path (can handle multiple files from different banks)",
+					Required:  true,
+					Aliases:   []string{"bank", "b"},
+					TakesFile: true,
 				},
+				Destination: &param.StatementFiles,
 			},
 			&cli.TimestampFlag{
 				Name:        "start",
@@ -51,6 +54,19 @@ func init() {
 				Layout:      "2006-01-02",
 				Aliases:     []string{"e"},
 				Destination: &param.End,
+			},
+			&cli.BoolFlag{
+				Name:    "verbose",
+				Usage:   "Debug mode print all log",
+				Aliases: []string{"v"},
+				Action: func(ctx *cli.Context, debug bool) error {
+					if debug {
+						log.Logger = log.Level(zerolog.DebugLevel)
+					} else {
+						log.Logger = log.Level(zerolog.ErrorLevel)
+					}
+					return nil
+				},
 			},
 		},
 		Action: func(ctx *cli.Context) error {
@@ -78,6 +94,10 @@ func init() {
 			fmt.Println("Total disrepancy\t:", 0)
 			return nil
 		},
+		Before: func(ctx *cli.Context) error {
+			log.Debug().Any("param", param).Msg("input parameter")
+			return nil
+		},
 		Suggest:              true,
 		EnableBashCompletion: true,
 	}
@@ -85,7 +105,6 @@ func init() {
 
 func Reconcile(args []string) {
 	if err := app.Run(args); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal().Msgf("%v", err)
 	}
 }

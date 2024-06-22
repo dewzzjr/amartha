@@ -1,6 +1,10 @@
 # Dependency directories (remove the comment below to include it)
 vendor
 
+# Binaries for programs and plugins
+bin/*
+!bin/.keep
+
 # Local development file
 *.debug*
 .vscode
