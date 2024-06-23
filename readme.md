@@ -42,3 +42,37 @@ Amartha manages multiple bank accounts and requires a service to reconcile trans
       - System transaction details if missing in bank statement(s)
       - Bank statement details if missing in system transactions (grouped by bank)
   - Total discrepancies (sum of absolute differences in amount between matched transactions)
+
+## How to run?
+
+**tl;dr** use terminal and run this block
+
+```sh
+go mod vendor && go run . \
+  -f test/data/system.csv \
+  -b test/data/bca.csv \
+  -b test/data/bni.csv \
+  --start 2024-06-20 \
+  --end 2024-06-21
+```
+
+### Prerequisition
+
+- go1.22.4
+- Make 3.81
+
+### Build
+
+Download vendor module then generate compiled binary file in bin/reconcile
+
+```sh
+make mod build
+```
+
+### Run
+
+Run binary to show complete usage manual. Enjoy
+
+```sh
+bin/reconcile
+```

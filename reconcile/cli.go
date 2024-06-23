@@ -93,8 +93,7 @@ func init() {
 				}
 				fmt.Println()
 			}
-			// TODO calculate disrepancy
-			fmt.Println("Total disrepancy\t:", 0)
+			fmt.Printf("Total disrepancy\t:%.2f\n", result.TotalDisrepancies())
 			return nil
 		},
 		Before: func(ctx *cli.Context) error {

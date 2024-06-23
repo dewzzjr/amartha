@@ -21,6 +21,18 @@ type Result struct {
 }
 
 func (r Result) TotalDisrepancies() float64 {
-	// TODO calculate total disrepancy
-	return 0
+	var transaction, statement float64
+	for _, t := range r.TransactionMissing {
+		transaction += t.Amount * t.Type.Float()
+	}
+
+	for _, statements := range r.StatementMissing {
+		for _, s := range statements {
+			statement += s.Amount
+		}
+	}
+	if transaction > statement {
+		return transaction - statement
+	}
+	return statement - transaction
 }
