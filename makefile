@@ -13,6 +13,7 @@ run:
 	@bin/reconcile \
 		-f test/data/system.csv \
 		-b test/data/bca.csv \
-		-b test/data/bni.csv
+		-b test/data/bni.csv \
+		-v
 
 .PHONY: test

@@ -3,18 +3,14 @@ package reconcile
 import (
 	"fmt"
 
+	"github.com/dewzzjr/amartha/reconcile/action"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 )
 
 var app *cli.App
-var param struct {
-	SourceFile     string
-	StatementFiles []string
-	Start          cli.Timestamp
-	End            cli.Timestamp
-}
+var param action.Param
 
 func init() {
 	if app != nil {
@@ -70,27 +66,27 @@ func init() {
 			},
 		},
 		Action: func(ctx *cli.Context) error {
-			fmt.Println("Transactions processed\t:", 0)
-			fmt.Println("Matched transactions\t:", 0)
-			fmt.Println("Unmatched transactions\t:", 0)
-			for i, v := range []string{} {
-				// 1. txID	filename.csv - uniqueID: -18.245,55
-				fmt.Printf("%d. %s\t%s - %s: %.2f\n", i+1, v, v, v, 0.01)
+			result, err := action.Run(param)
+			if err != nil {
+				return err
+			}
+			fmt.Println("Transactions processed\t:", result.Total)
+			fmt.Println("Matched transactions\t:", result.Matched)
+			fmt.Println("Unmatched transactions\t:", result.Unmatched)
+			fmt.Println()
+			fmt.Printf("%s - Missing bank statement:\n", param.SourceFile)
+			for i, v := range result.TransactionMissing {
+				fmt.Printf("%d. %v\n", i+1, v)
 			}
 			fmt.Println()
-			fmt.Println("Missing bank statement:")
-			for i, v := range []string{} {
-				fmt.Printf("%d. %s\n", i+1, v)
-			}
-			fmt.Println()
-			for _, file := range []string{} {
+			for _, file := range param.StatementFiles {
 				fmt.Printf("%s - Missing system transaction:\n", file)
-				// TODO placeholder result from using file parameter
-				for i, v := range []string{} {
-					fmt.Printf("%d. %s\n", i+1, v)
+				for i, v := range result.BankMissing[file] {
+					fmt.Printf("%d. %v\n", i+1, v)
 				}
 				fmt.Println()
 			}
+			// TODO calculate disrepancy
 			fmt.Println("Total disrepancy\t:", 0)
 			return nil
 		},
