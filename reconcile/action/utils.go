@@ -29,3 +29,7 @@ func DeleteAndPop[T any](slice *[]T, s int) (result T) {
 	*slice = append((*slice)[:s], (*slice)[s+1:]...)
 	return
 }
+
+func CompareTimestampWithDate(timestamp, date time.Time) bool {
+	return time.Date(timestamp.Year(), timestamp.Month(), timestamp.Day(), 0, 0, 0, 0, timestamp.Location()).Equal(date)
+}

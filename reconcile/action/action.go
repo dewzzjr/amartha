@@ -109,7 +109,3 @@ func Worker(path string, inputCh <-chan *TransactionModel, outputCh chan<- Outpu
 	}
 	missingCh <- models
 }
-
-func CompareTimestampWithDate(timestamp, date time.Time) bool {
-	return time.Date(timestamp.Year(), timestamp.Month(), timestamp.Day(), 0, 0, 0, 0, timestamp.Location()).Equal(date)
-}
