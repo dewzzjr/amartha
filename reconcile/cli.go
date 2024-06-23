@@ -83,7 +83,7 @@ func init() {
 				fmt.Println()
 			}
 			for _, file := range param.StatementFiles {
-				missing := result.BankMissing[file]
+				missing := result.StatementMissing[file]
 				if len(missing) == 0 {
 					continue
 				}
