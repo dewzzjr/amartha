@@ -198,7 +198,7 @@ func Run(param Param) (*Result, error) {
 	outputCh := make(chan Output)
 	missingCh := make(map[string]chan []BankModel)
 	for i, file := range param.StatementFiles {
-		inputCh = append(inputCh, make(chan *TransactionModel, 5))
+		inputCh = append(inputCh, make(chan *TransactionModel, 100))
 		missingCh[file] = make(chan []BankModel)
 		go Worker(file,
 			inputCh[i],
@@ -209,7 +209,7 @@ func Run(param Param) (*Result, error) {
 
 	var counter int
 	for record := range scanner {
-		log.Debug().Msgf("%+v", record)
+		log.Debug().Any("file", param.SourceFile).Msgf("%+v", record)
 		if ToTransactionModel(
 			record,
 			Filter(param.Start.Value(), param.End.Value(), false),
@@ -258,7 +258,7 @@ func Worker(path string, inputCh <-chan *TransactionModel, outputCh chan<- Outpu
 	}
 	models := make([]BankModel, 0)
 	for record := range scanner {
-		log.Debug().Msgf("%+v", record)
+		log.Debug().Any("file", path).Msgf("%+v", record)
 		m := ToBankModel(record, filter)
 		if m != nil {
 			models = append(models, *m)
