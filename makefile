@@ -14,6 +14,15 @@ run:
 		-f test/data/system.csv \
 		-b test/data/bca.csv \
 		-b test/data/bni.csv \
-		-v
+		--start 2024-06-20 \
+		--end 2024-06-21
+
+debug:
+	@bin/reconcile -v \
+		-f test/data/system.csv \
+		-b test/data/bca.csv \
+		-b test/data/bni.csv \
+		--start 2024-06-20 \
+		--end 2024-06-21
 
 .PHONY: test

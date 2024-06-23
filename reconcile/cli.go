@@ -11,6 +11,19 @@ import (
 
 var app *cli.App
 var param action.Param
+var debugFlag = &cli.BoolFlag{
+	Name:    "verbose",
+	Usage:   "Debug mode print all log",
+	Aliases: []string{"v"},
+	Action: func(ctx *cli.Context, debug bool) error {
+		if debug {
+			log.Logger = log.Level(zerolog.DebugLevel)
+		} else {
+			log.Logger = log.Level(zerolog.ErrorLevel)
+		}
+		return nil
+	},
+}
 
 func init() {
 	if app != nil {
@@ -51,19 +64,7 @@ func init() {
 				Aliases:     []string{"e"},
 				Destination: &param.End,
 			},
-			&cli.BoolFlag{
-				Name:    "verbose",
-				Usage:   "Debug mode print all log",
-				Aliases: []string{"v"},
-				Action: func(ctx *cli.Context, debug bool) error {
-					if debug {
-						log.Logger = log.Level(zerolog.DebugLevel)
-					} else {
-						log.Logger = log.Level(zerolog.ErrorLevel)
-					}
-					return nil
-				},
-			},
+			debugFlag,
 		},
 		Action: func(ctx *cli.Context) error {
 			result, err := action.Run(param)
@@ -74,14 +75,20 @@ func init() {
 			fmt.Println("Matched transactions\t:", result.Matched)
 			fmt.Println("Unmatched transactions\t:", result.Unmatched)
 			fmt.Println()
-			fmt.Printf("%s - Missing bank statement:\n", param.SourceFile)
-			for i, v := range result.TransactionMissing {
-				fmt.Printf("%d. %v\n", i+1, v)
+			if len(result.TransactionMissing) > 0 {
+				fmt.Printf("%s - Missing bank statement:\n", param.SourceFile)
+				for i, v := range result.TransactionMissing {
+					fmt.Printf("%d. %v\n", i+1, v)
+				}
+				fmt.Println()
 			}
-			fmt.Println()
 			for _, file := range param.StatementFiles {
+				missing := result.BankMissing[file]
+				if len(missing) == 0 {
+					continue
+				}
 				fmt.Printf("%s - Missing system transaction:\n", file)
-				for i, v := range result.BankMissing[file] {
+				for i, v := range missing {
 					fmt.Printf("%d. %v\n", i+1, v)
 				}
 				fmt.Println()
@@ -91,6 +98,7 @@ func init() {
 			return nil
 		},
 		Before: func(ctx *cli.Context) error {
+			debugFlag.RunAction(ctx)
 			log.Debug().Any("param", param).Msg("input parameter")
 			return nil
 		},
