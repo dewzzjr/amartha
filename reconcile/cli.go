@@ -71,29 +71,7 @@ func init() {
 			if err != nil {
 				return err
 			}
-			fmt.Println("Transactions processed\t:", result.Total)
-			fmt.Println("Matched transactions\t:", result.Matched)
-			fmt.Println("Unmatched transactions\t:", result.Unmatched)
-			fmt.Println()
-			if len(result.TransactionMissing) > 0 {
-				fmt.Printf("%s - Missing bank statement:\n", param.SourceFile)
-				for i, v := range result.TransactionMissing {
-					fmt.Printf("%d. %v\n", i+1, v)
-				}
-				fmt.Println()
-			}
-			for _, file := range param.StatementFiles {
-				missing := result.StatementMissing[file]
-				if len(missing) == 0 {
-					continue
-				}
-				fmt.Printf("%s - Missing system transaction:\n", file)
-				for i, v := range missing {
-					fmt.Printf("%d. %v\n", i+1, v)
-				}
-				fmt.Println()
-			}
-			fmt.Printf("Total disrepancy\t:%.2f\n", result.TotalDisrepancies())
+			Print(result)
 			return nil
 		},
 		Before: func(ctx *cli.Context) error {
@@ -104,6 +82,32 @@ func init() {
 		Suggest:              true,
 		EnableBashCompletion: true,
 	}
+}
+
+func Print(result *action.Result) {
+	fmt.Println("Transactions processed\t:", result.Total)
+	fmt.Println("Matched transactions\t:", result.Matched)
+	fmt.Println("Unmatched transactions\t:", result.Unmatched)
+	fmt.Println()
+	if len(result.TransactionMissing) > 0 {
+		fmt.Printf("%s - Missing bank statement:\n", param.SourceFile)
+		for i, v := range result.TransactionMissing {
+			fmt.Printf("%d. %v\n", i+1, v)
+		}
+		fmt.Println()
+	}
+	for _, file := range param.StatementFiles {
+		missing := result.StatementMissing[file]
+		if len(missing) == 0 {
+			continue
+		}
+		fmt.Printf("%s - Missing system transaction:\n", file)
+		for i, v := range missing {
+			fmt.Printf("%d. %v\n", i+1, v)
+		}
+		fmt.Println()
+	}
+	fmt.Printf("Total disrepancy\t: %.2f\n", result.TotalDisrepancies())
 }
 
 func Reconcile(args []string) {
